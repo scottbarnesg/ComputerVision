@@ -32,9 +32,9 @@ diff_gray = rgb2gray(diff);
 % Binarize Image
 bin_img = imbinarize(diff_gray,0.4); % 40 percent threshold
 % Find Differences
-[L_img num] = bwlabel(binary_img);
+[L_img num] = bwlabel(bin_img);
 % Calculate Object Areas & Centroids
-img_data = regionprops(binary_img,'centroid','area');
+img_data = regionprops(bin_img,'centroid','area');
 % Select Minimum Area of Interest (pixels)
 min_area = 100;
 % Extract Relevant Objects
@@ -125,7 +125,26 @@ end
 %% Compare Current Frame to Previous Frame
 run = 'true';
 while run == 'true'
-    frame_old = frame;
+    frame_old_hsv = frame_hsv;
     frame = snapshot(cam);
-    % Perform Color Conversion and Background Subtraction 
+    % Perform Color Conversion and Background Subtraction
+    frame_hsv = rgb2hsv(frame);
+    diff = bitxor(frame_old_hsv,frame_hsv);
+    diff_gray = rgb2gray(diff);
+    bin_img = imbinarize(diff_gray,0.4);
+    % Find objects that have moved
+    [L_img num] = bwlabel(bin_img);
+    img_data = regionprops(bin_img,'centroid','area');
+    min_area = 100;
+    for i = 1:num
+        if bin_img(i).Area > min_area
+            centroids(count,:) = cat(1,img_data(i).Centroid);
+            area(count,:) = cat(1,img_data.Area);
+            count = count+1;
+        end
+    end
+    % NEED TO FIGURE OUT HOW TO IDENTIFY WHICH OBJECT MOVED
+    % Shouldn't there be two gaps? One where the object was, and one where
+    % it is now? we can use the relationship between the sizes and
+    % locations of the objects to figure out which one moved.
 end
