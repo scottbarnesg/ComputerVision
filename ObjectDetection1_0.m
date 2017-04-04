@@ -1,3 +1,5 @@
+% Turn everything into separable functions
+
 %% Object Detection 1.0
 
 % Lightweight, Filterless Object Detection Algorithm for Still Cameras
